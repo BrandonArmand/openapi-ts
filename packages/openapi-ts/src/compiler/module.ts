@@ -69,15 +69,15 @@ export const createCallExpression = ({
  * @returns ts.ExportDeclaration
  */
 export const createNamedExportDeclarations = ({
-  imports,
+  exports,
   module,
 }: {
-  imports: Array<ImportExportItem> | ImportExportItem;
+  exports: Array<ImportExportItem> | ImportExportItem;
   module: string;
 }): ts.ExportDeclaration => {
-  imports = Array.isArray(imports) ? imports : [imports];
+  exports = Array.isArray(exports) ? exports : [exports];
 
-  const exportedTypes = Array.isArray(imports) ? imports : [imports];
+  const exportedTypes = Array.isArray(exports) ? exports : [exports];
   const hasNonTypeExport = exportedTypes.some(
     (item) => typeof item !== 'object' || !item.asType,
   );
