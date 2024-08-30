@@ -1,6 +1,14 @@
 import ts from 'typescript';
 
-import { isType } from './utils';
+import { createCallExpression } from './module';
+import { createTypeReferenceNode } from './types';
+import { createIdentifier, isType } from './utils';
+
+const createReturnStatement = ({
+  expression,
+}: {
+  expression?: ts.Expression;
+}) => ts.factory.createReturnStatement(expression);
 
 /**
  * Create a return function call statement.
@@ -19,15 +27,24 @@ export const createReturnFunctionCall = ({
   name: string;
   types?: string[];
 }) => {
-  const expression = ts.factory.createCallExpression(
-    ts.factory.createIdentifier(name),
-    types.map((type) => ts.factory.createTypeReferenceNode(type)),
-    args
-      .map((arg) =>
-        ts.isExpression(arg) ? arg : ts.factory.createIdentifier(arg),
-      )
-      .filter(isType<ts.Identifier | ts.Expression>),
+  const typeArguments = types.map((type) =>
+    createTypeReferenceNode({ typeName: type }),
   );
-  const statement = ts.factory.createReturnStatement(expression);
+  const argumentsArray = args
+    .map((arg) =>
+      ts.isExpression(arg) ? arg : createIdentifier({ text: arg }),
+    )
+    .filter(isType<ts.Identifier | ts.Expression>);
+  const expression = createCallExpression({
+    functionName: name,
+    parameters: argumentsArray,
+    types: typeArguments,
+  });
+  const statement = createReturnStatement({ expression });
   return statement;
 };
+
+export const createReturnVariable = ({ name }: { name: string }) =>
+  createReturnStatement({
+    expression: createIdentifier({ text: name }),
+  });

@@ -2,28 +2,13 @@ import type { Client } from '../../../types/client';
 import { getConfig } from '../../../utils/config';
 import { unique } from '../../../utils/unique';
 import type { Operation, Service } from '../../common/interfaces/client';
+import {
+  allowedServiceMethods,
+  getNewService,
+} from '../../common/parser/service';
 import type { OpenApi } from '../interfaces/OpenApi';
 import { getOperationParameters } from './getOperationParameters';
 import { getOperation } from './operation';
-
-const allowedServiceMethods = [
-  'connect',
-  'delete',
-  'get',
-  'head',
-  'options',
-  'patch',
-  'post',
-  'put',
-  'trace',
-] as const;
-
-const getNewService = (operation: Operation): Service => ({
-  $refs: [],
-  imports: [],
-  name: operation.service,
-  operations: [],
-});
 
 export const getServices = ({
   openApi,
@@ -31,9 +16,14 @@ export const getServices = ({
 }: {
   openApi: OpenApi;
   types: Client['types'];
-}): Service[] => {
+}): Pick<Client, 'operationIds' | 'services'> => {
   const config = getConfig();
 
+  const regexp = config.services.filter
+    ? new RegExp(config.services.filter)
+    : undefined;
+
+  const operationIds = new Map<string, string>();
   const services = new Map<string, Service>();
 
   for (const url in openApi.paths) {
@@ -46,10 +36,25 @@ export const getServices = ({
 
     for (const key in path) {
       const method = key as Lowercase<Operation['method']>;
-      if (allowedServiceMethods.includes(method)) {
+
+      const operationKey = `${method.toUpperCase()} ${url}`;
+      const shouldProcess = !regexp || regexp.test(operationKey);
+
+      if (shouldProcess && allowedServiceMethods.includes(method)) {
         const op = path[method]!;
+
+        if (op.operationId) {
+          if (operationIds.has(op.operationId)) {
+            console.warn(
+              `❗️ Duplicate operationId: ${op.operationId} in ${operationKey}. Please ensure your operation IDs are unique. This behavior is not supported and will likely lead to unexpected results.`,
+            );
+          } else {
+            operationIds.set(op.operationId, operationKey);
+          }
+        }
+
         const tags =
-          op.tags?.length && config.services.asClass
+          op.tags?.length && (config.services.asClass || config.name)
             ? op.tags.filter(unique)
             : ['Default'];
         tags.forEach((tag) => {
@@ -73,5 +78,8 @@ export const getServices = ({
     }
   }
 
-  return Array.from(services.values());
+  return {
+    operationIds,
+    services: Array.from(services.values()),
+  };
 };

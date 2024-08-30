@@ -1,9 +1,17 @@
 import { defineConfig } from '@hey-api/openapi-ts';
 
 export default defineConfig({
-  format: 'prettier',
+  client: '@hey-api/client-axios',
   input:
     'https://raw.githubusercontent.com/swagger-api/swagger-petstore/master/src/main/resources/openapi.yaml',
-  lint: 'eslint',
-  output: './src/client',
+  // 'https://raw.githubusercontent.com/Redocly/museum-openapi-example/main/openapi.yaml',
+  // '../../packages/openapi-ts/test/spec/v3.json',
+  output: {
+    format: 'prettier',
+    lint: 'eslint',
+    path: './src/client',
+  },
+  types: {
+    enums: 'javascript',
+  },
 });

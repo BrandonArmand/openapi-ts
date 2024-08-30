@@ -1,14 +1,22 @@
 import ts from 'typescript';
 
-import { createTypeNode } from './typedef';
+import { createCallExpression } from './module';
 import {
   type AccessLevel,
+  createTypeNode,
   type FunctionParameter,
+  type FunctionTypeParameter,
   toAccessLevelModifiers,
   toExpression,
   toParameterDeclarations,
+  toTypeParameters,
 } from './types';
-import { addLeadingJSDocComment, Comments, isType } from './utils';
+import {
+  addLeadingComments,
+  Comments,
+  createIdentifier,
+  isType,
+} from './utils';
 
 /**
  * Create a class constructor declaration.
@@ -37,9 +45,12 @@ export const createConstructorDeclaration = ({
     toParameterDeclarations(parameters),
     ts.factory.createBlock(statements, multiLine),
   );
-  if (comment?.length) {
-    addLeadingJSDocComment(node, comment);
-  }
+
+  addLeadingComments({
+    comments: comment,
+    node,
+  });
+
   return node;
 };
 
@@ -64,6 +75,7 @@ export const createMethodDeclaration = ({
   parameters = [],
   returnType,
   statements = [],
+  types = [],
 }: {
   accessLevel?: AccessLevel;
   comment?: Comments;
@@ -73,30 +85,39 @@ export const createMethodDeclaration = ({
   parameters?: FunctionParameter[];
   returnType?: string | ts.TypeNode;
   statements?: ts.Statement[];
+  types?: FunctionTypeParameter[];
 }) => {
-  const modifiers = toAccessLevelModifiers(accessLevel);
+  let modifiers = toAccessLevelModifiers(accessLevel);
+
   if (isStatic) {
-    modifiers.push(ts.factory.createModifier(ts.SyntaxKind.StaticKeyword));
+    modifiers = [
+      ...modifiers,
+      ts.factory.createModifier(ts.SyntaxKind.StaticKeyword),
+    ];
   }
+
   const node = ts.factory.createMethodDeclaration(
     modifiers,
     undefined,
-    ts.factory.createIdentifier(name),
+    createIdentifier({ text: name }),
     undefined,
-    [],
+    types ? toTypeParameters(types) : undefined,
     toParameterDeclarations(parameters),
     returnType ? createTypeNode(returnType) : undefined,
     ts.factory.createBlock(statements, multiLine),
   );
-  if (comment) {
-    addLeadingJSDocComment(node, comment);
-  }
+
+  addLeadingComments({
+    comments: comment,
+    node,
+  });
+
   return node;
 };
 
 type ClassDecorator = {
-  name: string;
   args: any[];
+  name: string;
 };
 
 /**
@@ -115,32 +136,34 @@ export const createClassDeclaration = ({
   members?: ts.ClassElement[];
   name: string;
 }) => {
-  const modifiers: ts.ModifierLike[] = [
+  let modifiers: ts.ModifierLike[] = [
     ts.factory.createModifier(ts.SyntaxKind.ExportKeyword),
   ];
+
   if (decorator) {
-    modifiers.unshift(
+    modifiers = [
       ts.factory.createDecorator(
-        ts.factory.createCallExpression(
-          ts.factory.createIdentifier(decorator.name),
-          undefined,
-          decorator.args
+        createCallExpression({
+          functionName: decorator.name,
+          parameters: decorator.args
             .map((arg) => toExpression({ value: arg }))
             .filter(isType<ts.Expression>),
-        ),
+        }),
       ),
-    );
+      ...modifiers,
+    ];
   }
+
   // Add newline between each class member.
-  const m: ts.ClassElement[] = [];
+  let m: ts.ClassElement[] = [];
   members.forEach((member) => {
-    m.push(member);
     // @ts-ignore
-    m.push(ts.factory.createIdentifier('\n'));
+    m = [...m, member, createIdentifier({ text: '\n' })];
   });
+
   return ts.factory.createClassDeclaration(
     modifiers,
-    ts.factory.createIdentifier(name),
+    createIdentifier({ text: name }),
     [],
     [],
     m,

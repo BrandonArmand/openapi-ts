@@ -22,6 +22,7 @@ import {
 } from './inferType';
 
 export const getModel = ({
+  debug,
   definition,
   initialValues = {},
   isDefinition = false,
@@ -30,6 +31,7 @@ export const getModel = ({
   parentDefinition = null,
   types,
 }: Pick<Client, 'types'> & {
+  debug?: boolean;
   definition: OpenApiSchema;
   /**
    * Pass through initial model values
@@ -81,8 +83,11 @@ export const getModel = ({
   };
 
   if (definition.$ref) {
-    const definitionRef = getType({ type: definition.$ref });
-    model.$refs = [...model.$refs, definition.$ref];
+    const definitionRef = getType({
+      debug,
+      type: definition.$ref,
+    });
+    model.$refs = [...model.$refs, decodeURIComponent(definition.$ref)];
     model.base = definitionRef.base;
     model.export = 'reference';
     model.imports = [...model.imports, ...definitionRef.imports];
@@ -107,10 +112,47 @@ export const getModel = ({
     }
   }
 
-  if (definitionTypes.includes('array') && definition.items) {
+  if (
+    definitionTypes.includes('array') &&
+    (definition.items || definition.prefixItems)
+  ) {
+    if (definition.prefixItems) {
+      const arrayItems = definition.prefixItems.map((item) =>
+        getModel({
+          definition: item,
+          openApi,
+          parentDefinition: definition,
+          types,
+        }),
+      );
+
+      model.export = 'array';
+      model.$refs = [
+        ...model.$refs,
+        ...arrayItems.reduce(
+          (acc, m) => [...acc, ...m.$refs],
+          [] as Model['$refs'],
+        ),
+      ];
+      model.imports = [
+        ...model.imports,
+        ...arrayItems.reduce(
+          (acc, m) => [...acc, ...m.imports],
+          [] as Model['imports'],
+        ),
+      ];
+      model.link = arrayItems;
+      model.default = getDefault(definition, model);
+      return model;
+    }
+
+    if (!definition.items) {
+      return model;
+    }
+
     if (definition.items.$ref) {
       const arrayItems = getType({ type: definition.items.$ref });
-      model.$refs = [...model.$refs, definition.items.$ref];
+      model.$refs = [...model.$refs, decodeURIComponent(definition.items.$ref)];
       model.base = arrayItems.base;
       model.export = 'array';
       model.imports = [...model.imports, ...arrayItems.imports];
@@ -167,23 +209,34 @@ export const getModel = ({
   if (foundComposition) {
     const composition = getModelComposition({
       ...foundComposition,
+      debug,
       definition,
       getModel,
       model,
       openApi,
       types,
     });
-    return { ...model, ...composition };
+    const result = { ...model, ...composition };
+    return result;
   }
 
-  if (definitionTypes.includes('object') || definition.properties) {
-    if (definition.properties) {
+  if (
+    definitionTypes.includes('object') ||
+    definition.properties ||
+    definition.additionalProperties
+  ) {
+    if (
+      definition.properties &&
+      (Object.keys(definition.properties).length > 0 ||
+        !definition.additionalProperties)
+    ) {
       model.base = 'unknown';
       model.export = 'interface';
       model.type = 'unknown';
       model.default = getDefault(definition, model);
 
       const modelProperties = getModelProperties({
+        debug,
         definition,
         getModel,
         openApi,
@@ -202,25 +255,38 @@ export const getModel = ({
 
       if (definition.additionalProperties) {
         const modelProperty = getAdditionalPropertiesModel({
+          debug,
           definition,
           getModel,
           model,
           openApi,
           types,
         });
-        model.properties.push(modelProperty);
+        model.properties = [...model.properties, modelProperty];
+      }
+
+      // objects with no explicit properties accept any key/value pair
+      if (
+        !model.properties.length &&
+        model.base === 'unknown' &&
+        model.type === 'unknown'
+      ) {
+        model.export = 'dictionary';
+        model.name = '[key: string]';
       }
 
       return model;
     }
 
-    return getAdditionalPropertiesModel({
+    const result = getAdditionalPropertiesModel({
+      debug,
       definition,
       getModel,
       model,
       openApi,
       types,
     });
+    return result;
   }
 
   if (definition.const !== undefined) {

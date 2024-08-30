@@ -6,14 +6,19 @@ import { getServices } from '../getServices';
 describe('getServices', () => {
   it('should create a unnamed service if tags are empty', () => {
     setConfig({
-      client: 'fetch',
+      client: {
+        name: 'fetch',
+      },
+      configFile: '',
       debug: false,
       dryRun: true,
+      experimental_parser: false,
       exportCore: true,
       input: '',
       output: {
         path: '',
       },
+      plugins: [],
       schemas: {},
       services: {
         operationId: true,
@@ -22,7 +27,7 @@ describe('getServices', () => {
       useOptions: true,
     });
 
-    const services = getServices({
+    const { services } = getServices({
       openApi: {
         info: {
           title: 'x',

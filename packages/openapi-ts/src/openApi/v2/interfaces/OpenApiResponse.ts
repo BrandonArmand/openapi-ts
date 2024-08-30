@@ -5,11 +5,11 @@ import type { OpenApiReference } from './OpenApiReference';
 import type { OpenApiSchema } from './OpenApiSchema';
 
 /**
- * {@link} https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#response-object
+ * {@link} https://github.com/OAI/OpenAPI-Specification/blob/main/versions/2.0.md#response-object
  */
 export interface OpenApiResponse extends OpenApiReference {
   description: string;
-  schema?: OpenApiSchema & OpenApiReference;
-  headers?: Dictionary<OpenApiHeader>;
   examples?: OpenApiExample;
+  headers?: Dictionary<OpenApiHeader>;
+  schema?: OpenApiSchema & OpenApiReference;
 }

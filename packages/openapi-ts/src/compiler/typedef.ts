@@ -1,65 +1,34 @@
 import ts from 'typescript';
 
-import {
-  addLeadingJSDocComment,
-  type Comments,
-  ots,
-  tsNodeToString,
-} from './utils';
+import { createTypeNode, createTypeReferenceNode } from './types';
+import { addLeadingComments, type Comments, tsNodeToString } from './utils';
 
-export const createTypeNode = (
-  base: any | ts.TypeNode,
-  args?: (any | ts.TypeNode)[],
-): ts.TypeNode => {
-  if (ts.isTypeNode(base)) {
-    return base;
-  }
-
-  if (typeof base === 'number') {
-    return ts.factory.createLiteralTypeNode(ots.number(base));
-  }
-
-  return ts.factory.createTypeReferenceNode(
-    base,
-    args?.map((arg) => createTypeNode(arg)),
-  );
-};
-
-/**
- * Create a type alias declaration. Example `export type X = Y;`.
- * @param comment (optional) comments to add
- * @param name the name of the type
- * @param type the type
- * @returns ts.TypeAliasDeclaration
- */
-export const createTypeAliasDeclaration = ({
-  comment,
-  name,
-  type,
-}: {
-  comment?: Comments;
-  name: string;
-  type: string | ts.TypeNode;
-}): ts.TypeAliasDeclaration => {
-  const node = ts.factory.createTypeAliasDeclaration(
-    [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-    ts.factory.createIdentifier(name),
-    [],
-    createTypeNode(type),
-  );
-  if (comment) {
-    addLeadingJSDocComment(node, comment);
-  }
-  return node;
-};
+const nullNode = createTypeReferenceNode({ typeName: 'null' });
 
 // Property of a interface type node.
 export type Property = {
+  comment?: Comments;
+  isReadOnly?: boolean;
+  isRequired?: boolean;
   name: string;
   type: any | ts.TypeNode;
-  isRequired?: boolean;
-  isReadOnly?: boolean;
-  comment?: Comments;
+};
+
+/**
+ * Returns a union of provided node with null if marked as nullable,
+ * otherwise returns the provided node unmodified.
+ */
+const maybeNullable = ({
+  isNullable,
+  node,
+}: {
+  isNullable?: boolean;
+  node: ts.TypeNode;
+}) => {
+  if (!isNullable) {
+    return node;
+  }
+  return ts.factory.createUnionTypeNode([node, nullNode]);
 };
 
 /**
@@ -68,35 +37,42 @@ export type Property = {
  * @param isNullable - if the whole interface can be nullable
  * @returns ts.TypeLiteralNode | ts.TypeUnionNode
  */
-export const createTypeInterfaceNode = (
-  properties: Property[],
-  isNullable: boolean = false,
-) => {
+export const createTypeInterfaceNode = ({
+  isNullable,
+  properties,
+}: {
+  isNullable?: boolean;
+  properties: Property[];
+}) => {
   const node = ts.factory.createTypeLiteralNode(
     properties.map((property) => {
-      const signature = ts.factory.createPropertySignature(
-        property.isReadOnly
-          ? [ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword)]
-          : undefined,
-        property.name,
-        property.isRequired
+      const modifiers: readonly ts.Modifier[] | undefined = property.isReadOnly
+        ? [ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword)]
+        : undefined;
+
+      const questionToken: ts.QuestionToken | undefined =
+        property.isRequired !== false
           ? undefined
-          : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
-        createTypeNode(property.type),
+          : ts.factory.createToken(ts.SyntaxKind.QuestionToken);
+
+      const type: ts.TypeNode | undefined = createTypeNode(property.type);
+
+      const signature = ts.factory.createPropertySignature(
+        modifiers,
+        property.name,
+        questionToken,
+        type,
       );
-      if (property.comment) {
-        addLeadingJSDocComment(signature, property.comment);
-      }
+
+      addLeadingComments({
+        comments: property.comment,
+        node: signature,
+      });
+
       return signature;
     }),
   );
-  if (!isNullable) {
-    return node;
-  }
-  return ts.factory.createUnionTypeNode([
-    node,
-    ts.factory.createTypeReferenceNode('null'),
-  ]);
+  return maybeNullable({ isNullable, node });
 };
 
 /**
@@ -105,36 +81,34 @@ export const createTypeInterfaceNode = (
  * @param isNullable - if the whole type can be null
  * @returns ts.UnionTypeNode
  */
-export const createTypeUnionNode = (
-  types: (any | ts.TypeNode)[],
-  isNullable: boolean = false,
-) => {
+export const createTypeUnionNode = ({
+  isNullable,
+  types,
+}: {
+  isNullable?: boolean;
+  types: (any | ts.TypeNode)[];
+}) => {
   const nodes = types.map((type) => createTypeNode(type));
-  if (isNullable) {
-    nodes.push(ts.factory.createTypeReferenceNode('null'));
-  }
-  return ts.factory.createUnionTypeNode(nodes);
+  const node = ts.factory.createUnionTypeNode(nodes);
+  return maybeNullable({ isNullable, node });
 };
 
 /**
- * Create type intersect node. Example `string & number & boolean`
+ * Create type intersection node. Example `string & number & boolean`
  * @param types - the types in the union
  * @param isNullable - if the whole type can be null
  * @returns ts.IntersectionTypeNode | ts.UnionTypeNode
  */
-export const createTypeIntersectNode = (
-  types: (any | ts.TypeNode)[],
-  isNullable: boolean = false,
-) => {
-  const nodes = types.map((t) => createTypeNode(t));
-  const intersect = ts.factory.createIntersectionTypeNode(nodes);
-  if (isNullable) {
-    return ts.factory.createUnionTypeNode([
-      intersect,
-      ts.factory.createTypeReferenceNode('null'),
-    ]);
-  }
-  return intersect;
+export const createTypeIntersectionNode = ({
+  isNullable,
+  types,
+}: {
+  isNullable?: boolean;
+  types: (any | ts.TypeNode)[];
+}) => {
+  const nodes = types.map((type) => createTypeNode(type));
+  const node = ts.factory.createIntersectionTypeNode(nodes);
+  return maybeNullable({ isNullable, node });
 };
 
 /**
@@ -151,15 +125,8 @@ export const createTypeTupleNode = ({
   types: Array<any | ts.TypeNode>;
 }) => {
   const nodes = types.map((type) => createTypeNode(type));
-  const tupleNode = ts.factory.createTupleTypeNode(nodes);
-  if (isNullable) {
-    const unionNode = ts.factory.createUnionTypeNode([
-      tupleNode,
-      ts.factory.createTypeReferenceNode('null'),
-    ]);
-    return unionNode;
-  }
-  return tupleNode;
+  const node = ts.factory.createTupleTypeNode(nodes);
+  return maybeNullable({ isNullable, node });
 };
 
 /**
@@ -174,25 +141,24 @@ export const createTypeRecordNode = (
   values: (any | ts.TypeNode)[],
   isNullable: boolean = false,
 ) => {
-  const keyNode = createTypeUnionNode(keys);
-  const valueNode = createTypeUnionNode(values);
+  const keyNode = createTypeUnionNode({
+    types: keys,
+  });
+  const valueNode = createTypeUnionNode({
+    types: values,
+  });
   // NOTE: We use the syntax `{ [key: string]: string }` because using a Record causes
   //       invalid types with circular dependencies. This is functionally the same.
   // Ref: https://github.com/hey-api/openapi-ts/issues/370
-  const node = createTypeInterfaceNode([
-    {
-      isRequired: true,
-      name: `[key: ${tsNodeToString({ node: keyNode, unescape: true })}]`,
-      type: valueNode,
-    },
-  ]);
-  if (!isNullable) {
-    return node;
-  }
-  return ts.factory.createUnionTypeNode([
-    node,
-    ts.factory.createTypeReferenceNode('null'),
-  ]);
+  const node = createTypeInterfaceNode({
+    properties: [
+      {
+        name: `[key: ${tsNodeToString({ node: keyNode, unescape: true })}]`,
+        type: valueNode,
+      },
+    ],
+  });
+  return maybeNullable({ isNullable, node });
 };
 
 /**
@@ -205,14 +171,9 @@ export const createTypeArrayNode = (
   types: (any | ts.TypeNode)[],
   isNullable: boolean = false,
 ) => {
-  const node = ts.factory.createTypeReferenceNode('Array', [
-    createTypeUnionNode(types),
-  ]);
-  if (!isNullable) {
-    return node;
-  }
-  return ts.factory.createUnionTypeNode([
-    node,
-    ts.factory.createTypeReferenceNode('null'),
-  ]);
+  const node = createTypeReferenceNode({
+    typeArguments: [createTypeUnionNode({ types })],
+    typeName: 'Array',
+  });
+  return maybeNullable({ isNullable, node });
 };

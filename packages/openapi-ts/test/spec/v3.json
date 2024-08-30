@@ -13,10 +13,10 @@
     "/api/v{api-version}/no-tag": {
       "tags": [],
       "get": {
-        "operationId": "ServiceWithEmptyTag"
+        "operationId": "export"
       },
       "post": {
-        "operationId": "PostServiceWithEmptyTag",
+        "operationId": "import",
         "requestBody": {
           "required": true,
           "content": {
@@ -37,10 +37,21 @@
         },
         "responses": {
           "default": {
+            "description": "Default success response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ModelWithReadOnlyAndWriteOnly"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json; type=collection": {
+                "schema": {
+                  "$ref": "#/components/schemas/Model-From.Zendesk"
                 }
               }
             }
@@ -256,18 +267,8 @@
           },
           {
             "description": "This is the parameter that goes into the query params",
-            "name": "parameterQuery",
+            "name": "cursor",
             "in": "query",
-            "required": true,
-            "nullable": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "This is the parameter that goes into the form data",
-            "name": "parameterForm",
-            "in": "formData",
             "required": true,
             "nullable": true,
             "schema": {
@@ -295,6 +296,7 @@
             }
           },
           {
+            "description": "api-version should be required in standalone clients",
             "name": "api-version",
             "in": "path",
             "required": true,
@@ -311,7 +313,8 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ModelWithString"
+                "properties": {},
+                "type": "object"
               }
             }
           }
@@ -384,16 +387,6 @@
             }
           },
           {
-            "description": "This is the parameter that goes into the request form data",
-            "name": "parameter_form",
-            "in": "formData",
-            "required": true,
-            "nullable": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "description": "This is the parameter that goes into the cookie",
             "name": "PARAMETER-COOKIE",
             "in": "cookie",
@@ -404,6 +397,7 @@
             }
           },
           {
+            "description": "api-version should be required in standalone clients",
             "name": "api-version",
             "in": "path",
             "required": true,
@@ -434,11 +428,11 @@
         "parameters": [
           {
             "description": "This is an optional parameter",
-            "name": "parameter",
+            "name": "page",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           }
         ],
@@ -474,9 +468,31 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ModelWithString"
+                "properties": {
+                  "offset": {
+                    "nullable": true,
+                    "required": true,
+                    "type": "number"
+                  }
+                },
+                "type": "object"
               }
             }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response is a simple number",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Success"
           }
         }
       }
@@ -764,8 +780,14 @@
         "tags": ["MultipleTags1", "MultipleTags2"],
         "operationId": "DummyA",
         "responses": {
-          "204": {
-            "description": "Success"
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400"
+                }
+              }
+            }
           }
         }
       }
@@ -790,7 +812,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ModelWithString"
+                  "$ref": "#/components/schemas/import"
                 }
               }
             }
@@ -802,7 +824,7 @@
         "operationId": "CallWithDuplicateResponses",
         "responses": {
           "default": {
-            "description": "Message for default response",
+            "description": "Default error response",
             "content": {
               "application/json": {
                 "schema": {
@@ -899,7 +921,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ModelWithString"
+                  "$ref": "#/components/schemas/ModelWithStringError"
                 }
               }
             }
@@ -1206,15 +1228,7 @@
         "operationId": "UploadFile",
         "parameters": [
           {
-            "description": "Supply a file reference for upload",
-            "name": "file",
-            "in": "formData",
-            "required": true,
-            "schema": {
-              "type": "file"
-            }
-          },
-          {
+            "description": "api-version should be required in standalone clients",
             "name": "api-version",
             "in": "path",
             "required": true,
@@ -1224,6 +1238,17 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "description": "Supply a file reference for upload",
+              "schema": {
+                "type": "file"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
@@ -1251,6 +1276,7 @@
             }
           },
           {
+            "description": "api-version should be required in standalone clients",
             "name": "api-version",
             "in": "path",
             "required": true,
@@ -1425,6 +1451,7 @@
             }
           },
           {
+            "description": "api-version should be required in standalone clients",
             "name": "api-version",
             "in": "path",
             "required": true,
@@ -1614,6 +1641,21 @@
               }
             }
           }
+        }
+      },
+      "put": {
+        "tags": ["Non-Ascii-æøåÆØÅöôêÊ"],
+        "summary": "Login User",
+        "operationId": "putWithFormUrlEncoded",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/ArrayWithStrings"
+              }
+            }
+          },
+          "required": true
         }
       }
     }
@@ -3184,6 +3226,27 @@
         "minItems": 3,
         "maxItems": 3
       },
+      "ModelWithPrefixItemsConstantSizeArray": {
+        "type": "array",
+        "prefixItems": [
+          {
+            "$ref": "#/components/schemas/ModelWithInteger"
+          },
+          {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          {
+            "type": "string"
+          }
+        ]
+      },
       "ModelWithAnyOfConstantSizeArrayNullable": {
         "type": ["array"],
         "items": {
@@ -3208,7 +3271,7 @@
               "type": "number"
             },
             {
-              "type": "string"
+              "$ref": "#/components/schemas/import"
             }
           ]
         },
@@ -3250,6 +3313,31 @@
           }
         }
       },
+      "ModelWithOneOfAndProperties": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/components/parameters/SimpleParameter"
+          },
+          {
+            "$ref": "#/components/schemas/NonAsciiStringæøåÆØÅöôêÊ字符串"
+          }
+        ],
+        "required": ["baz", "qux"],
+        "properties": {
+          "baz": {
+            "type": "integer",
+            "format": "uint16",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "qux": {
+            "type": "integer",
+            "format": "uint8",
+            "minimum": 0.0
+          }
+        }
+      },
       "ParameterSimpleParameterUnused": {
         "description": "Model used to test deduplication strategy (unused)",
         "type": "string"
@@ -3269,6 +3357,223 @@
       "DeleteFooData2": {
         "description": "Model used to test deduplication strategy",
         "type": "string"
+      },
+      "import": {
+        "description": "Model with restricted keyword name",
+        "type": "string"
+      },
+      "400": {
+        "description": "Model with number-only name",
+        "type": "string"
+      },
+      "SchemaWithFormRestrictedKeys": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "x-enum-descriptions": {
+            "type": "string"
+          },
+          "x-enum-varnames": {
+            "type": "string"
+          },
+          "x-enumNames": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "object": {
+            "type": "object",
+            "properties": {
+              "description": {
+                "type": "string"
+              },
+              "x-enum-descriptions": {
+                "type": "string"
+              },
+              "x-enum-varnames": {
+                "type": "string"
+              },
+              "x-enumNames": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          },
+          "array": {
+            "type": "array",
+            "items": [
+              {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "x-enum-descriptions": {
+                    "type": "string"
+                  },
+                  "x-enum-varnames": {
+                    "type": "string"
+                  },
+                  "x-enumNames": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "io.k8s.apimachinery.pkg.apis.meta.v1.DeleteOptions": {
+        "description": "This schema was giving PascalCase transformations a hard time",
+        "properties": {
+          "preconditions": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Preconditions"
+              }
+            ],
+            "description": "Must be fulfilled before a deletion is carried out. If not possible, a 409 Conflict status will be returned."
+          }
+        },
+        "type": "object"
+      },
+      "io.k8s.apimachinery.pkg.apis.meta.v1.Preconditions": {
+        "description": "This schema was giving PascalCase transformations a hard time",
+        "properties": {
+          "resourceVersion": {
+            "description": "Specifies the target ResourceVersion",
+            "type": "string"
+          },
+          "uid": {
+            "description": "Specifies the target UID.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "AdditionalPropertiesUnknownIssue": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "AdditionalPropertiesUnknownIssue2": {
+        "type": "object",
+        "additionalProperties": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "AdditionalPropertiesUnknownIssue3": {
+        "type": "object",
+        "allOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "required": ["entries"],
+            "properties": {
+              "entries": {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/AdditionalPropertiesUnknownIssue"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "AdditionalPropertiesIntegerIssue": {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": {
+          "type": "integer"
+        }
+      },
+      "OneOfAllOfIssue": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ConstValue"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Generic.Schema.Duplicate.Issue`1[System.Boolean]"
+                  }
+                ]
+              },
+              {
+                "$ref": "#/components/schemas/3e-num_1Период"
+              }
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/Generic.Schema.Duplicate.Issue`1[System.String]"
+          }
+        ]
+      },
+      "Generic.Schema.Duplicate.Issue`1[System.Boolean]": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "type": "boolean"
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          },
+          "hasError": {
+            "type": "boolean",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Generic.Schema.Duplicate.Issue`1[System.String]": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "type": "string",
+            "nullable": true
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          },
+          "hasError": {
+            "type": "boolean",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
       }
     }
   }

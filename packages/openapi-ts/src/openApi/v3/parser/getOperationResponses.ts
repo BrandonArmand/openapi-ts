@@ -1,17 +1,24 @@
 import type { Client } from '../../../types/client';
 import type { OperationResponse } from '../../common/interfaces/client';
 import { getRef } from '../../common/parser/getRef';
-import { parseResponseStatusCode } from '../../common/parser/operation';
+import {
+  parseResponseStatusCode,
+  sorterByResponseStatusCode,
+  tagResponseTypes,
+} from '../../common/parser/operation';
 import type { OpenApi } from '../interfaces/OpenApi';
 import type { OpenApiResponse } from '../interfaces/OpenApiResponse';
 import type { OpenApiResponses } from '../interfaces/OpenApiResponses';
 import { getOperationResponse } from './getOperationResponse';
 
 export const getOperationResponses = ({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  debug,
   openApi,
   responses,
   types,
 }: {
+  debug?: boolean;
   openApi: OpenApi;
   responses: OpenApiResponses;
   types: Client['types'];
@@ -34,8 +41,7 @@ export const getOperationResponses = ({
     operationResponses = [...operationResponses, operationResponse];
   });
 
-  // Sort the responses to 2xx success codes come before 4xx and 5xx error codes.
-  return operationResponses.sort((a, b): number =>
-    a.code < b.code ? -1 : a.code > b.code ? 1 : 0,
-  );
+  operationResponses = tagResponseTypes(operationResponses);
+
+  return operationResponses.sort(sorterByResponseStatusCode);
 };

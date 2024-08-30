@@ -16,8 +16,26 @@ export default defineConfig({
       {
         items: [
           { link: '/openapi-ts/output', text: 'Output' },
-          { link: '/openapi-ts/clients', text: 'Clients' },
-          { link: '/openapi-ts/interceptors', text: 'Interceptors' },
+          {
+            collapsed: true,
+            items: [
+              {
+                link: '/openapi-ts/clients/fetch',
+                text: 'Fetch API',
+              },
+              {
+                link: '/openapi-ts/clients/axios',
+                text: 'Axios',
+              },
+              {
+                link: '/openapi-ts/clients/legacy',
+                text: 'Legacy',
+              },
+            ],
+            link: '/openapi-ts/clients',
+            text: 'Clients',
+          },
+          { link: '/openapi-ts/transformers', text: 'Transformers' },
           { link: '/openapi-ts/migrating', text: 'Migrating' },
         ],
         text: 'Guides and Concepts',
@@ -30,7 +48,7 @@ export default defineConfig({
           },
           {
             link: '/openapi-ts/tanstack-query',
-            text: 'TanStack Query <span class="soon">soon</span>',
+            text: 'TanStack Query',
           },
         ],
         text: 'Plugins',

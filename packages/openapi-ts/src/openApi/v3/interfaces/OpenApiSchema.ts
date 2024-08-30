@@ -6,7 +6,7 @@ import type { OpenApiReference } from './OpenApiReference';
 import type { OpenApiXml } from './OpenApiXml';
 
 /**
- * {@link} https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.1.0.md#schema-object
+ * {@link} https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md#schema-object
  */
 export interface OpenApiSchema extends OpenApiReference, WithEnumExtension {
   additionalProperties?: boolean | OpenApiSchema;
@@ -35,19 +35,20 @@ export interface OpenApiSchema extends OpenApiReference, WithEnumExtension {
     | 'password'
     | 'string';
   items?: OpenApiSchema;
-  maximum?: number;
   maxItems?: number;
   maxLength?: number;
   maxProperties?: number;
-  minimum?: number;
+  maximum?: number;
   minItems?: number;
   minLength?: number;
   minProperties?: number;
+  minimum?: number;
   multipleOf?: number;
   not?: OpenApiSchema[];
   nullable?: boolean;
   oneOf?: OpenApiSchema[];
   pattern?: string;
+  prefixItems?: OpenApiSchema[];
   properties?: Dictionary<OpenApiSchema>;
   readOnly?: boolean;
   required?: string[];

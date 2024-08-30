@@ -1,2 +1,15 @@
-export { client, createClient, OpenAPI, request } from '../';
-export type { CancelablePromise } from '@hey-api/client-core';
+export { createClient } from '../';
+export type {
+  Client,
+  Config,
+  Options,
+  RequestOptions,
+  RequestOptionsBase,
+  RequestResult,
+} from '../types';
+export {
+  createConfig,
+  formDataBodySerializer,
+  jsonBodySerializer,
+  urlSearchParamsBodySerializer,
+} from '../utils';

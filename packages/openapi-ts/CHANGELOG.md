@@ -1,5 +1,211 @@
 # @hey-api/openapi-ts
 
+## 0.52.11
+
+### Patch Changes
+
+- [#981](https://github.com/hey-api/openapi-ts/pull/981) [`afd8c43`](https://github.com/hey-api/openapi-ts/commit/afd8c4386fb7b2f86a54e73c9471945bdfad22ea) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: export query key functions from TanStack Query plugin
+
+## 0.52.10
+
+### Patch Changes
+
+- [#973](https://github.com/hey-api/openapi-ts/pull/973) [`8f7a14f`](https://github.com/hey-api/openapi-ts/commit/8f7a14f570e2d17053f1e612f6e045df774916f1) Thanks [@jacobinu](https://github.com/jacobinu)! - fix: handle tree-shakeable angular client case
+
+## 0.52.9
+
+### Patch Changes
+
+- [#948](https://github.com/hey-api/openapi-ts/pull/948) [`ebfd6ee`](https://github.com/hey-api/openapi-ts/commit/ebfd6eec434d7b84883a8f9058f31948fb1a40f2) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: handle schemas with generics from C#
+
+- [#949](https://github.com/hey-api/openapi-ts/pull/949) [`16f8956`](https://github.com/hey-api/openapi-ts/commit/16f89566a7affeb09a6b928c43cfa2733e8b9adc) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: rename infinite key in query key to \_infinite
+
+- [#946](https://github.com/hey-api/openapi-ts/pull/946) [`f873fa6`](https://github.com/hey-api/openapi-ts/commit/f873fa67befe60b2fd8f63bc2c8b73437591f686) Thanks [@mrlubos](https://github.com/mrlubos)! - chore: warn on duplicate operation ID
+
+- [#947](https://github.com/hey-api/openapi-ts/pull/947) [`7f0fefe`](https://github.com/hey-api/openapi-ts/commit/7f0fefec92b25ce18ed0d1c6a6edf1adbc7d4481) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: correctly use parentheses around composed schemas
+
+- [#944](https://github.com/hey-api/openapi-ts/pull/944) [`2f7cc89`](https://github.com/hey-api/openapi-ts/commit/2f7cc8986c0644b41cc6a5526ddf52ebff880c79) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: correctly handle integer type in additional properties
+
+## 0.52.8
+
+### Patch Changes
+
+- [#932](https://github.com/hey-api/openapi-ts/pull/932) [`cdf01e8`](https://github.com/hey-api/openapi-ts/commit/cdf01e8cc0dc63213465b9e8fe33b80443d36f55) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: cherry pick keys in mutation page param type
+
+## 0.52.7
+
+### Patch Changes
+
+- [#929](https://github.com/hey-api/openapi-ts/pull/929) [`b56c81c`](https://github.com/hey-api/openapi-ts/commit/b56c81ca67a2d069b33430c3139e2135a299b309) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: handle various issues with additionalProperties definitions
+
+- [#927](https://github.com/hey-api/openapi-ts/pull/927) [`65f151d`](https://github.com/hey-api/openapi-ts/commit/65f151dc0004ce817bc370486495bdd281439e55) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: update TanStack Query key to contain base URL
+
+- [#927](https://github.com/hey-api/openapi-ts/pull/927) [`65f151d`](https://github.com/hey-api/openapi-ts/commit/65f151dc0004ce817bc370486495bdd281439e55) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: change TanStack Query mutation helpers to functions for consistent API
+
+## 0.52.6
+
+### Patch Changes
+
+- [#920](https://github.com/hey-api/openapi-ts/pull/920) [`4ff2404`](https://github.com/hey-api/openapi-ts/commit/4ff24049457b7d0d5333c3704f488f1f45dd0c5b) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: add preview version of TanStack Query plugin
+
+## 0.52.5
+
+### Patch Changes
+
+- [#910](https://github.com/hey-api/openapi-ts/pull/910) [`428dcad`](https://github.com/hey-api/openapi-ts/commit/428dcad06eba3ab14876c28092a6df81fcde7dbe) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: throw if prerequisite checks are not met
+
+- [#907](https://github.com/hey-api/openapi-ts/pull/907) [`a2a1ab8`](https://github.com/hey-api/openapi-ts/commit/a2a1ab8bd78c2cbbdcb7adb2ba3815250843dbe7) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: correctly transform string to pascalcase when referenced inside schema
+
+- [#908](https://github.com/hey-api/openapi-ts/pull/908) [`225b640`](https://github.com/hey-api/openapi-ts/commit/225b640b5ac628cb7ba3b7afb39ff271a0608055) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: do not generate types tree by default if services are enabled as it is unused
+
+## 0.52.4
+
+### Patch Changes
+
+- [#895](https://github.com/hey-api/openapi-ts/pull/895) [`44de8d8`](https://github.com/hey-api/openapi-ts/commit/44de8d89556b3abf48acc4e23c9b9c198059c757) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: define ThrowOnError generic as the last argument
+
+## 0.52.3
+
+### Patch Changes
+
+- [#884](https://github.com/hey-api/openapi-ts/pull/884) [`62a39e6`](https://github.com/hey-api/openapi-ts/commit/62a39e63f645bce0801779fb6b90531401748e86) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: generate ThrowOnError generic for class-based client methods
+
+## 0.52.2
+
+### Patch Changes
+
+- [#881](https://github.com/hey-api/openapi-ts/pull/881) [`a9ddfe6`](https://github.com/hey-api/openapi-ts/commit/a9ddfe6c4487fe5debd04a194ee6c6b6c611dc6b) Thanks [@hougesen](https://github.com/hougesen)! - fix: check if key is schema property before removing
+
+## 0.52.1
+
+### Patch Changes
+
+- [#855](https://github.com/hey-api/openapi-ts/pull/855) [`7ac6274`](https://github.com/hey-api/openapi-ts/commit/7ac627463a15fa6be2c9d103b25200355df6b166) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: define multiple errors type as union instead of intersection
+
+- [#853](https://github.com/hey-api/openapi-ts/pull/853) [`6ab387d`](https://github.com/hey-api/openapi-ts/commit/6ab387d3440ec5ec524e7f198aedfa6734431d76) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: remove Content-Type header with multipart/form-data content type
+
+- [#861](https://github.com/hey-api/openapi-ts/pull/861) [`21ccf90`](https://github.com/hey-api/openapi-ts/commit/21ccf90b864590c211fbfa3de5c687dd3c48f897) Thanks [@qqilihq](https://github.com/qqilihq)! - fix: Additional properties key
+
+- [#869](https://github.com/hey-api/openapi-ts/pull/869) [`42d8a41`](https://github.com/hey-api/openapi-ts/commit/42d8a4151bace7b70af60a1abe46b7550ddad686) Thanks [@SamuelGuillemet](https://github.com/SamuelGuillemet)! - fix: add conditionnal generation for service related types
+
+## 0.52.0
+
+### Minor Changes
+
+- [#835](https://github.com/hey-api/openapi-ts/pull/835) [`7ab277b`](https://github.com/hey-api/openapi-ts/commit/7ab277b22467fe268719af817aee701d6be3e828) Thanks [@LeeChSien](https://github.com/LeeChSien)! - feat: add namespace supporting for enums
+
+### Patch Changes
+
+- [#830](https://github.com/hey-api/openapi-ts/pull/830) [`babf11a`](https://github.com/hey-api/openapi-ts/commit/babf11ae082af642ac71cfee9c523cc976132a50) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: generate internal client for services when using standalone package
+
+## 0.51.0
+
+### Minor Changes
+
+- [#828](https://github.com/hey-api/openapi-ts/pull/828) [`82a4696`](https://github.com/hey-api/openapi-ts/commit/82a4696b0b209ea2d9147f47f213479e61aed3d7) Thanks [@mrlubos](https://github.com/mrlubos)! - feat: make `client` config option required
+
+### Patch Changes
+
+- [#823](https://github.com/hey-api/openapi-ts/pull/823) [`23c9dcd`](https://github.com/hey-api/openapi-ts/commit/23c9dcd5de19de62d745cc539674c815b2588cd2) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: correctly process body parameter for OpenAPI 2.0 specs
+
+- [#827](https://github.com/hey-api/openapi-ts/pull/827) [`8d81c06`](https://github.com/hey-api/openapi-ts/commit/8d81c0605dbf4b4d19ec1c2dc51a93f8a2aca5b2) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: do not ignore api-version param in standalone clients
+
+## 0.50.2
+
+### Patch Changes
+
+- [#818](https://github.com/hey-api/openapi-ts/pull/818) [`85d123c`](https://github.com/hey-api/openapi-ts/commit/85d123c9160f4ecb4c48e8a2ead54abf604dd21b) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: handle fully illegal schema names
+
+## 0.50.1
+
+### Patch Changes
+
+- [#807](https://github.com/hey-api/openapi-ts/pull/807) [`ef249ba`](https://github.com/hey-api/openapi-ts/commit/ef249ba5bd04dbfb0e0a497caaa021f9c7de6949) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: generate types only for filtered services
+
+- [#807](https://github.com/hey-api/openapi-ts/pull/807) [`ef249ba`](https://github.com/hey-api/openapi-ts/commit/ef249ba5bd04dbfb0e0a497caaa021f9c7de6949) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: allow any key/value pair in object types with empty properties object
+
+## 0.50.0
+
+### Minor Changes
+
+- [#790](https://github.com/hey-api/openapi-ts/pull/790) [`68c3921`](https://github.com/hey-api/openapi-ts/commit/68c3921fd6e9a5db41ebd9f06e4f3ef6e64ab051) Thanks [@mrlubos](https://github.com/mrlubos)! - feat: allow bundling standalone clients with `client.bundle = true`
+
+## 0.49.0
+
+### Minor Changes
+
+- [#787](https://github.com/hey-api/openapi-ts/pull/787) [`327c5fb`](https://github.com/hey-api/openapi-ts/commit/327c5fb629f0c7b9c727da87b6bc287b8e98bcd5) Thanks [@mrlubos](https://github.com/mrlubos)! - feat: allow filtering service endpoints with `services.filter`
+
+### Patch Changes
+
+- [#784](https://github.com/hey-api/openapi-ts/pull/784) [`f12dccf`](https://github.com/hey-api/openapi-ts/commit/f12dccf0ae3a05badb5783354bcd093f18f3ab74) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: suffix illegal service names
+
+- [#786](https://github.com/hey-api/openapi-ts/pull/786) [`20759e2`](https://github.com/hey-api/openapi-ts/commit/20759e2cc52d78974fc0f78f581e9d9cb2d21ca5) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: handle references to schemas with illegal names
+
+- [#788](https://github.com/hey-api/openapi-ts/pull/788) [`ecd94f2`](https://github.com/hey-api/openapi-ts/commit/ecd94f2adab1dbe10e7a9c310d1fb6d1f170d332) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: handle application/x-www-form-urlencoded content in request body
+
+## 0.48.3
+
+### Patch Changes
+
+- [#781](https://github.com/hey-api/openapi-ts/pull/781) [`df3b799`](https://github.com/hey-api/openapi-ts/commit/df3b79996d47a69e4f2fdad93cea18ae1a01c419) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: use methodNameBuilder when asClass is false
+
+- [#782](https://github.com/hey-api/openapi-ts/pull/782) [`edfd2bd`](https://github.com/hey-api/openapi-ts/commit/edfd2bdbb64f6682ded16f6da30f88f1c113bbe0) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: allow not generating types tree with types.tree = false
+
+## 0.48.2
+
+### Patch Changes
+
+- [#746](https://github.com/hey-api/openapi-ts/pull/746) [`0448823`](https://github.com/hey-api/openapi-ts/commit/044882399d56d1532c7125df2e69cfb3b5fb4f34) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: handle formData parameters in generated types
+
+- [#742](https://github.com/hey-api/openapi-ts/pull/742) [`efc30f4`](https://github.com/hey-api/openapi-ts/commit/efc30f4a2327b165b62f8467c68351a8bf94ffe5) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: ignore services.asClass setting for named clients
+
+- [#744](https://github.com/hey-api/openapi-ts/pull/744) [`1e9edde`](https://github.com/hey-api/openapi-ts/commit/1e9edde54abd8978405f91b821c99b97f067d566) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: improve default response type detection
+
+- [#745](https://github.com/hey-api/openapi-ts/pull/745) [`342772a`](https://github.com/hey-api/openapi-ts/commit/342772a560378c6718d25c29871eeab9a72c62a6) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: handle properties in one-of composition
+
+## 0.48.1
+
+### Patch Changes
+
+- [#734](https://github.com/hey-api/openapi-ts/pull/734) [`1f52b26`](https://github.com/hey-api/openapi-ts/commit/1f52b260807531edb2c14003473ea4907007ecdb) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: generate service types when types are enabled, even if services are disabled
+
+- [#737](https://github.com/hey-api/openapi-ts/pull/737) [`0537fe8`](https://github.com/hey-api/openapi-ts/commit/0537fe8682a93cc95d7637d643db4b9780318ea1) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: support custom config file path
+
+- [#736](https://github.com/hey-api/openapi-ts/pull/736) [`8410046`](https://github.com/hey-api/openapi-ts/commit/8410046c45d25db48ba940a0c6c7a7cda9e86b6a) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: handle async response transformers
+
+## 0.48.0
+
+### Minor Changes
+
+- [#696](https://github.com/hey-api/openapi-ts/pull/696) [`917405f`](https://github.com/hey-api/openapi-ts/commit/917405fcdcb2e978df693eb51720afa6fcf914e2) Thanks [@anchan828](https://github.com/anchan828)! - feat: pass the Operation object to methodNameBuilder
+
+### Patch Changes
+
+- [#708](https://github.com/hey-api/openapi-ts/pull/708) [`36cf95d`](https://github.com/hey-api/openapi-ts/commit/36cf95d319b175149d3b3ecc382b8d739186e658) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: make getHeaders() accept generic
+
+- [#712](https://github.com/hey-api/openapi-ts/pull/712) [`6a5b96b`](https://github.com/hey-api/openapi-ts/commit/6a5b96b59e4248f2acaf5422be262edde97427dd) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: handle void responses in transformers
+
+## 0.47.2
+
+### Patch Changes
+
+- [#701](https://github.com/hey-api/openapi-ts/pull/701) [`1081bbf`](https://github.com/hey-api/openapi-ts/commit/1081bbf5082450c18547dac4737ecc0e312cdd0e) Thanks [@mrlubos](https://github.com/mrlubos)! - feat: add initial implementation of prefixItems
+
+## 0.47.1
+
+### Patch Changes
+
+- [#690](https://github.com/hey-api/openapi-ts/pull/690) [`1017ace`](https://github.com/hey-api/openapi-ts/commit/1017acee80630d84a08bd8f0087c8fb0de270f1a) Thanks [@Nick-Lucas](https://github.com/Nick-Lucas)! - Fix an issue where transforms for endpoints with array returns were not generated correctly
+
+## 0.47.0
+
+### Minor Changes
+
+- [#685](https://github.com/hey-api/openapi-ts/pull/685) [`8ca3e5e`](https://github.com/hey-api/openapi-ts/commit/8ca3e5e2990bc07ce0bac902245d08b67b6621e8) Thanks [@mrlubos](https://github.com/mrlubos)! - feat: add initial support for response transformers (string -> Date)
+
+- [#663](https://github.com/hey-api/openapi-ts/pull/663) [`e01c612`](https://github.com/hey-api/openapi-ts/commit/e01c61213e266afad5e3b159682b05957aac6534) Thanks [@Stono](https://github.com/Stono)! - Add support for customizing method names with `services.methodNameBuilder()`
+
 ## 0.46.3
 
 ### Patch Changes

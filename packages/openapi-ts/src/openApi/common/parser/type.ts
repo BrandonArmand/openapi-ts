@@ -1,10 +1,10 @@
-import camelcase from 'camelcase';
-
+import { camelCase } from '../../../utils/camelCase';
 import { getConfig, isStandaloneClient } from '../../../utils/config';
+import { refParametersPartial } from '../../../utils/const';
+import { reservedWordsRegExp } from '../../../utils/reservedWords';
 import { transformTypeName } from '../../../utils/transform';
 import { isDefinitionTypeNullable } from '../../v3/parser/inferType';
 import type { Type } from '../interfaces/Type';
-import { reservedWords } from './reservedWords';
 import {
   ensureValidTypeScriptJavaScriptIdentifier,
   sanitizeOperationParameterName,
@@ -24,6 +24,7 @@ export const getMappedType = (
   switch (type) {
     case 'any':
     case 'object':
+    case 'unknown':
       return 'unknown';
     case 'array':
       return 'unknown[]';
@@ -54,15 +55,31 @@ export const getMappedType = (
 };
 
 /**
+ * Matches characters inside square brackets, including the brackets. Does not
+ * match if the opening bracket is preceded by "`1" which is a syntax for generics
+ * from C#.
+ *
+ * Hello[World] -> matches [World]
+ * Hello`1[World] -> no match
+ * string[] -> matches []
+ */
+export const hasSquareBracketsRegExp = /(?<!`1)\[.*\]$/g;
+
+/**
  * Parse any string value into a type object.
  * @param type String or String[] value like "integer", "Link[Model]" or ["string", "null"].
  * @param format String value like "binary" or "date".
  */
 export const getType = ({
+  debug,
   format,
   type = 'unknown',
 }: {
+  debug?: boolean;
   format?: string;
+  /**
+   * Type can be the name of a schema component, a ref string, or any definition type.
+   */
   type?: string | string[];
 }): Type => {
   const result: Type = {
@@ -97,13 +114,16 @@ export const getType = ({
 
   const typeWithoutNamespace = decodeURIComponent(stripNamespace(type));
 
-  if (/\[.*\]$/g.test(typeWithoutNamespace)) {
+  hasSquareBracketsRegExp.lastIndex = 0;
+  if (hasSquareBracketsRegExp.test(typeWithoutNamespace)) {
     const matches = typeWithoutNamespace.match(/(.*?)\[(.*)\]$/);
     if (matches?.length) {
       const match1 = getType({
+        debug,
         type: ensureValidTypeScriptJavaScriptIdentifier(matches[1]),
       });
       const match2 = getType({
+        debug,
         type: ensureValidTypeScriptJavaScriptIdentifier(matches[2]),
       });
 
@@ -136,7 +156,7 @@ export const getType = ({
     let encodedType = transformTypeName(
       ensureValidTypeScriptJavaScriptIdentifier(typeWithoutNamespace),
     );
-    if (type.startsWith('#/components/parameters/')) {
+    if (type.startsWith(refParametersPartial)) {
       // prefix parameter names to avoid conflicts, assuming people are mostly
       // interested in importing schema types and don't care about this naming
       encodedType = `Parameter${encodedType}`;
@@ -144,7 +164,7 @@ export const getType = ({
     result.type = encodedType;
     result.base = encodedType;
     if (type.startsWith('#')) {
-      result.$refs = [...result.$refs, type];
+      result.$refs = [...result.$refs, decodeURIComponent(type)];
     }
     result.imports = [...result.imports, encodedType];
     return result;
@@ -165,6 +185,8 @@ export const transformTypeKeyName = (value: string): string => {
     return value;
   }
 
-  const clean = sanitizeOperationParameterName(value).trim();
-  return camelcase(clean).replace(reservedWords, '_$1');
+  const name = camelCase({
+    input: sanitizeOperationParameterName(value),
+  }).replace(reservedWordsRegExp, '_$1');
+  return name;
 };

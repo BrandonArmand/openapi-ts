@@ -10,16 +10,16 @@ import type { OpenApiSchema } from './OpenApiSchema';
 import type { OpenApiSecurityScheme } from './OpenApiSecurityScheme';
 
 /**
- * {@link} https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.1.0.md#components-object
+ * {@link} https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md#components-object
  */
 export interface OpenApiComponents {
-  schemas?: Dictionary<OpenApiSchema>;
-  responses?: Dictionary<OpenApiResponses>;
-  parameters?: Dictionary<OpenApiParameter>;
-  examples?: Dictionary<OpenApiExample>;
-  requestBodies?: Dictionary<OpenApiRequestBody>;
-  headers?: Dictionary<OpenApiHeader>;
-  securitySchemes?: Dictionary<OpenApiSecurityScheme>;
-  links?: Dictionary<OpenApiLink>;
   callbacks?: Dictionary<OpenApiCallback>;
+  examples?: Dictionary<OpenApiExample>;
+  headers?: Dictionary<OpenApiHeader>;
+  links?: Dictionary<OpenApiLink>;
+  parameters?: Dictionary<OpenApiParameter>;
+  requestBodies?: Dictionary<OpenApiRequestBody>;
+  responses?: Dictionary<OpenApiResponses>;
+  schemas?: Dictionary<OpenApiSchema>;
+  securitySchemes?: Dictionary<OpenApiSecurityScheme>;
 }

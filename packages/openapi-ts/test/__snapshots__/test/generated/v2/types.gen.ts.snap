@@ -87,7 +87,7 @@ export const EnumWithStrings = {
     ERROR: 'Error',
     _SINGLE_QUOTE_: "'Single Quote'",
     _DOUBLE_QUOTES_: '"Double Quotes"',
-    'NON_ASCII__ØÆÅÔÖ_ØÆÅÔÖ字符串': 'Non-ascii: øæåôöØÆÅÔÖ字符串'
+    NON_ASCII__ØÆÅÔÖ_ØÆÅÔÖ字符串: 'Non-ascii: øæåôöØÆÅÔÖ字符串'
 } as const;
 
 /**
@@ -269,11 +269,11 @@ export type ModelWithNullableString = {
     /**
      * This is a simple string property
      */
-    nullableProp?: string | null;
+    nullableProp?: (string) | null;
     /**
      * This is a simple string property
      */
-    nullableRequiredProp: string | null;
+    nullableRequiredProp: (string) | null;
 };
 
 /**
@@ -438,6 +438,37 @@ export type ModelWithPattern = {
     patternWithBacktick?: string;
 };
 
+export type parameter_ActivityParams = {
+    description?: string;
+    graduate_id?: number;
+    organization_id?: number;
+    parent_activity?: number;
+    post_id?: number;
+};
+
+export type response_PostActivityResponse = {
+    description?: string;
+    graduate_id?: number;
+    organization_id?: number;
+    parent_activity_id?: number;
+    post_id?: number;
+};
+
+export type failure_Failure = {
+    error?: string;
+    message?: string;
+    reference_code?: string;
+};
+
+export type PostApiBodyData = {
+    /**
+     * Body should not be unknown
+     */
+    request: parameter_ActivityParams;
+};
+
+export type PostApiBodyResponse = (response_PostActivityResponse);
+
 export type CallWithDescriptionsData = {
     /**
      * Testing backticks in string: `backticks` and ```multiple backticks``` should work
@@ -588,11 +619,11 @@ export type CallToTestOrderOfParamsData = {
     /**
      * This is a string that can be null with default
      */
-    parameterStringNullableWithDefault?: string | null;
+    parameterStringNullableWithDefault?: (string) | null;
     /**
      * This is a string that can be null with no default
      */
-    parameterStringNullableWithNoDefault?: string | null;
+    parameterStringNullableWithNoDefault?: (string) | null;
     /**
      * This is a string with default
      */
@@ -607,23 +638,23 @@ export type CallToTestOrderOfParamsData = {
     parameterStringWithNoDefault: string;
 };
 
-export type CallWithNoContentResponseResponse = void;
+export type CallWithNoContentResponseResponse = (void);
 
-export type CallWithResponseAndNoContentResponseResponse = unknown | void;
+export type CallWithResponseAndNoContentResponseResponse = (unknown | void);
 
-export type CallWithResponseResponse = ModelWithString;
+export type CallWithResponseResponse = (ModelWithString);
 
-export type CallWithDuplicateResponsesResponse = ModelWithString;
+export type CallWithDuplicateResponsesResponse = (ModelWithString);
 
-export type CallWithResponsesResponse = {
+export type CallWithResponsesResponse = ({
     readonly '@namespace.string'?: string;
     readonly '@namespace.integer'?: number;
     readonly value?: Array<ModelWithString>;
-} | ModelThatExtends | ModelThatExtendsExtends;
+} | ModelThatExtends | ModelThatExtendsExtends);
 
-export type DummyAResponse = void;
+export type DummyAResponse = (void);
 
-export type DummyBResponse = void;
+export type DummyBResponse = (void);
 
 export type CollectionFormatData = {
     /**
@@ -685,7 +716,7 @@ export type TypesData = {
     parameterString: string;
 };
 
-export type TypesResponse = number | string | boolean | unknown;
+export type TypesResponse = (number | string | boolean | unknown);
 
 export type ComplexTypesData = {
     /**
@@ -704,9 +735,9 @@ export type ComplexTypesData = {
     parameterReference: ModelWithString;
 };
 
-export type ComplexTypesResponse = Array<ModelWithString>;
+export type ComplexTypesResponse = (Array<ModelWithString>);
 
-export type CallWithResultFromHeaderResponse = string;
+export type CallWithResultFromHeaderResponse = (string);
 
 export type TestErrorCodeData = {
     /**
@@ -715,7 +746,7 @@ export type TestErrorCodeData = {
     status: string;
 };
 
-export type TestErrorCodeResponse = unknown;
+export type TestErrorCodeResponse = (unknown);
 
 export type NonAsciiæøåÆøÅöôêÊ字符串Data = {
     /**
@@ -724,250 +755,4 @@ export type NonAsciiæøåÆøÅöôêÊ字符串Data = {
     nonAsciiParamæøåÆøÅöôêÊ: number;
 };
 
-export type NonAsciiæøåÆøÅöôêÊ字符串Response = NonAsciiStringæøåÆØÅöôêÊ字符串;
-
-export type $OpenApiTs = {
-    '/api/v{api-version}/descriptions/': {
-        post: {
-            req: CallWithDescriptionsData;
-        };
-    };
-    '/api/v{api-version}/parameters/{parameterPath}': {
-        post: {
-            req: CallWithParametersData;
-        };
-    };
-    '/api/v{api-version}/parameters/{parameter.path.1}/{parameter-path-2}/{PARAMETER-PATH-3}': {
-        post: {
-            req: CallWithWeirdParameterNamesData;
-        };
-    };
-    '/api/v{api-version}/defaults': {
-        get: {
-            req: CallWithDefaultParametersData;
-        };
-        post: {
-            req: CallWithDefaultOptionalParametersData;
-        };
-        put: {
-            req: CallToTestOrderOfParamsData;
-        };
-    };
-    '/api/v{api-version}/no-content': {
-        get: {
-            res: {
-                /**
-                 * Success
-                 */
-                204: void;
-            };
-        };
-    };
-    '/api/v{api-version}/multiple-tags/response-and-no-content': {
-        get: {
-            res: {
-                /**
-                 * Response is a simple number
-                 */
-                200: unknown;
-                /**
-                 * Success
-                 */
-                204: void;
-            };
-        };
-    };
-    '/api/v{api-version}/response': {
-        get: {
-            res: {
-                /**
-                 * Message for default response
-                 */
-                default: ModelWithString;
-            };
-        };
-        post: {
-            res: {
-                /**
-                 * Message for 201 response
-                 */
-                201: ModelWithString;
-                /**
-                 * Message for 500 error
-                 */
-                500: ModelWithStringError;
-                /**
-                 * Message for 501 error
-                 */
-                501: ModelWithStringError;
-                /**
-                 * Message for 502 error
-                 */
-                502: ModelWithStringError;
-                /**
-                 * Message for default response
-                 */
-                default: ModelWithString;
-            };
-        };
-        put: {
-            res: {
-                /**
-                 * Message for 200 response
-                 */
-                200: {
-                    readonly '@namespace.string'?: string;
-                    readonly '@namespace.integer'?: number;
-                    readonly value?: Array<ModelWithString>;
-                };
-                /**
-                 * Message for 201 response
-                 */
-                201: ModelThatExtends;
-                /**
-                 * Message for 202 response
-                 */
-                202: ModelThatExtendsExtends;
-                /**
-                 * Message for 500 error
-                 */
-                500: ModelWithStringError;
-                /**
-                 * Message for 501 error
-                 */
-                501: ModelWithStringError;
-                /**
-                 * Message for 502 error
-                 */
-                502: ModelWithStringError;
-                /**
-                 * Message for default response
-                 */
-                default: ModelWithString;
-            };
-        };
-    };
-    '/api/v{api-version}/multiple-tags/a': {
-        get: {
-            res: {
-                /**
-                 * Success
-                 */
-                204: void;
-            };
-        };
-    };
-    '/api/v{api-version}/multiple-tags/b': {
-        get: {
-            res: {
-                /**
-                 * Success
-                 */
-                204: void;
-            };
-        };
-    };
-    '/api/v{api-version}/collectionFormat': {
-        get: {
-            req: CollectionFormatData;
-        };
-    };
-    '/api/v{api-version}/types': {
-        get: {
-            req: TypesData;
-            res: {
-                /**
-                 * Response is a simple number
-                 */
-                200: number;
-                /**
-                 * Response is a simple string
-                 */
-                201: string;
-                /**
-                 * Response is a simple boolean
-                 */
-                202: boolean;
-                /**
-                 * Response is a simple object
-                 */
-                203: unknown;
-            };
-        };
-    };
-    '/api/v{api-version}/complex': {
-        get: {
-            req: ComplexTypesData;
-            res: {
-                /**
-                 * Successful response
-                 */
-                200: Array<ModelWithString>;
-                /**
-                 * 400 server error
-                 */
-                400: unknown;
-                /**
-                 * 500 server error
-                 */
-                500: unknown;
-            };
-        };
-    };
-    '/api/v{api-version}/header': {
-        post: {
-            res: {
-                /**
-                 * Successful response
-                 */
-                200: string;
-                /**
-                 * 400 server error
-                 */
-                400: unknown;
-                /**
-                 * 500 server error
-                 */
-                500: unknown;
-            };
-        };
-    };
-    '/api/v{api-version}/error': {
-        post: {
-            req: TestErrorCodeData;
-            res: {
-                /**
-                 * Custom message: Successful response
-                 */
-                200: unknown;
-                /**
-                 * Custom message: Internal Server Error
-                 */
-                500: unknown;
-                /**
-                 * Custom message: Not Implemented
-                 */
-                501: unknown;
-                /**
-                 * Custom message: Bad Gateway
-                 */
-                502: unknown;
-                /**
-                 * Custom message: Service Unavailable
-                 */
-                503: unknown;
-            };
-        };
-    };
-    '/api/v{api-version}/non-ascii-æøåÆØÅöôêÊ字符串': {
-        post: {
-            req: NonAsciiæøåÆøÅöôêÊ字符串Data;
-            res: {
-                /**
-                 * Successful response
-                 */
-                200: NonAsciiStringæøåÆØÅöôêÊ字符串;
-            };
-        };
-    };
-};
+export type NonAsciiæøåÆøÅöôêÊ字符串Response = (NonAsciiStringæøåÆØÅöôêÊ字符串);

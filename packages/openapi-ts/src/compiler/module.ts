@@ -1,16 +1,18 @@
 import ts from 'typescript';
 
 import { getConfig } from '../utils/config';
+import { createTypeReferenceNode } from './types';
 import {
-  addLeadingJSDocComment,
+  addLeadingComments,
   type Comments,
+  createIdentifier,
   type ImportExportItemObject,
   ots,
 } from './utils';
 
 /**
  * Create export all declaration. Example: `export * from './y'`.
- * @param module - module to export from.
+ * @param module - module containing exports
  * @returns ts.ExportDeclaration
  */
 export const createExportAllDeclaration = (module: string) => {
@@ -26,13 +28,41 @@ export const createExportAllDeclaration = (module: string) => {
   );
 };
 
-type ImportExportItem = ImportExportItemObject | string;
+export type ImportExportItem = ImportExportItemObject | string;
+
+export const createCallExpression = ({
+  parameters = [],
+  functionName,
+  types,
+}: {
+  functionName: string | ts.PropertyAccessExpression;
+  parameters?: Array<string | ts.Expression | undefined>;
+  types?: ReadonlyArray<ts.TypeNode>;
+}) => {
+  const expression =
+    typeof functionName === 'string'
+      ? createIdentifier({ text: functionName })
+      : functionName;
+  const argumentsArray = parameters
+    .filter((parameter) => parameter !== undefined)
+    .map((parameter) =>
+      typeof parameter === 'string'
+        ? createIdentifier({ text: parameter })
+        : parameter,
+    );
+  const callExpression = ts.factory.createCallExpression(
+    expression,
+    types,
+    argumentsArray,
+  );
+  return callExpression;
+};
 
 /**
  * Create a named export declaration. Example: `export { X } from './y'`.
- * @param items - the items to export.
- * @param module - module to export it from.
- * @returns ExportDeclaration
+ * @param exports - named imports to export
+ * @param module - module containing exports
+ * @returns ts.ExportDeclaration
  */
 export const createNamedExportDeclarations = (
   items: Array<ImportExportItem> | ImportExportItem,
@@ -44,7 +74,7 @@ export const createNamedExportDeclarations = (
   const hasNonTypeExport = exportedTypes.some(
     (item) => typeof item !== 'object' || !item.asType,
   );
-  const elements = items.map((name) => {
+  const elements = exportedTypes.map((name) => {
     const item = typeof name === 'string' ? { name } : name;
     return ots.export({
       alias: item.alias,
@@ -64,51 +94,82 @@ export const createNamedExportDeclarations = (
 };
 
 /**
- * Create a const variable export. Optionally, it can use const assertion.
- * Example: `export x = {} as const`.
- * @param constAssertion use const assertion?
+ * Create a const variable. Optionally, it can use const assertion or export
+ * statement. Example: `export x = {} as const`.
+ * @param assertion use const assertion?
+ * @param exportConst export created variable?
  * @param expression expression for the variable.
  * @param name name of the variable.
  * @returns ts.VariableStatement
  */
-export const createExportConstVariable = ({
+export const createConstVariable = ({
   comment,
-  constAssertion = false,
+  assertion,
+  destructure,
+  exportConst,
   expression,
   name,
+  typeName,
 }: {
+  assertion?: 'const' | ts.TypeNode;
   comment?: Comments;
-  constAssertion?: boolean;
+  destructure?: boolean;
+  exportConst?: boolean;
   expression: ts.Expression;
   name: string;
+  // TODO: support a more intuitive definition of generics for example
+  typeName?: string | ts.IndexedAccessTypeNode;
 }): ts.VariableStatement => {
-  const initializer = constAssertion
+  const initializer = assertion
     ? ts.factory.createAsExpression(
         expression,
-        ts.factory.createTypeReferenceNode('const'),
+        typeof assertion === 'string'
+          ? createTypeReferenceNode({
+              typeName: assertion,
+            })
+          : assertion,
       )
     : expression;
+  const nameIdentifier = createIdentifier({ text: name });
   const declaration = ts.factory.createVariableDeclaration(
-    ts.factory.createIdentifier(name),
+    destructure
+      ? ts.factory.createObjectBindingPattern([
+          ts.factory.createBindingElement(
+            undefined,
+            undefined,
+            nameIdentifier,
+            undefined,
+          ),
+        ])
+      : nameIdentifier,
     undefined,
-    undefined,
+    typeName
+      ? typeof typeName === 'string'
+        ? createTypeReferenceNode({ typeName })
+        : typeName
+      : undefined,
     initializer,
   );
   const statement = ts.factory.createVariableStatement(
-    [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+    exportConst
+      ? [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)]
+      : undefined,
     ts.factory.createVariableDeclarationList([declaration], ts.NodeFlags.Const),
   );
-  if (comment) {
-    addLeadingJSDocComment(statement, comment);
-  }
+
+  addLeadingComments({
+    comments: comment,
+    node: statement,
+  });
+
   return statement;
 };
 
 /**
  * Create a named import declaration. Example: `import { X } from './y'`.
- * @param items - the items to export.
- * @param module - module to export it from.
- * @returns ImportDeclaration
+ * @param imports - named exports to import
+ * @param module - module containing imports
+ * @returns ts.ImportDeclaration
  */
 export const createNamedImportDeclarations = (
   items: Array<ImportExportItem> | ImportExportItem,

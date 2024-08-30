@@ -37,6 +37,7 @@ export const findModelComposition = (
 };
 
 export const getModelComposition = ({
+  debug,
   definition,
   definitions,
   getModel,
@@ -46,6 +47,7 @@ export const getModelComposition = ({
   types,
 }: Composition &
   Pick<Client, 'types'> & {
+    debug?: boolean;
     definition: OpenApiSchema;
     getModel: GetModelFn;
     model: Model;
@@ -62,14 +64,16 @@ export const getModelComposition = ({
   let properties: Model[] = [];
 
   definitions
-    .map((def) =>
-      getModel({
+    .map((def) => {
+      const modelFromDef = getModel({
+        debug,
         definition: def,
         openApi,
         parentDefinition: definition,
         types,
-      }),
-    )
+      });
+      return modelFromDef;
+    })
     .forEach((model) => {
       composition.$refs = [...composition.$refs, ...model.$refs];
       composition.imports = [...composition.imports, ...model.imports];
@@ -116,33 +120,53 @@ export const getModelComposition = ({
 
   if (properties.length) {
     const foundComposition = findModelComposition(definition);
-    if (foundComposition?.type === 'one-of') {
-      composition.properties.forEach((property) => {
-        property.properties = [...property.properties, ...properties];
-      });
-    } else {
-      composition.properties = [
-        ...composition.properties,
-        {
-          $refs: [],
-          base: 'unknown',
-          description: '',
-          enum: [],
-          enums: [],
-          export: 'interface',
-          imports: [],
-          in: '',
-          isDefinition: false,
-          isNullable: false,
-          isReadOnly: false,
-          isRequired: false,
-          link: null,
-          name: 'properties',
-          properties,
-          template: null,
-          type: 'unknown',
-        },
-      ];
+    if (foundComposition) {
+      const propertiesProperty: Model = {
+        $refs: [],
+        base: 'unknown',
+        description: '',
+        enum: [],
+        enums: [],
+        export: 'interface',
+        imports: [],
+        in: '',
+        isDefinition: false,
+        isNullable: false,
+        isReadOnly: false,
+        isRequired: false,
+        link: null,
+        name: 'properties',
+        properties,
+        template: null,
+        type: 'unknown',
+      };
+
+      if (foundComposition.type === 'one-of') {
+        composition.properties = [
+          {
+            ...composition,
+            base: '',
+            description: null,
+            enum: [],
+            in: '',
+            isDefinition: false,
+            isNullable: false,
+            isReadOnly: false,
+            isRequired: true,
+            link: null,
+            name: '',
+            template: null,
+            type: '',
+          },
+          propertiesProperty,
+        ];
+        composition.export = 'all-of';
+      } else {
+        composition.properties = [
+          ...composition.properties,
+          propertiesProperty,
+        ];
+      }
     }
   }
 

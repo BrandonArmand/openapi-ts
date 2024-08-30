@@ -10,15 +10,20 @@ import {
 describe('registerHandlebarHelpers', () => {
   it('should register the helpers', () => {
     setConfig({
-      client: 'fetch',
+      client: {
+        name: 'fetch',
+      },
+      configFile: '',
       debug: false,
       dryRun: false,
+      experimental_parser: false,
       exportCore: true,
       input: '',
       output: {
         format: 'prettier',
         path: '',
       },
+      plugins: [],
       schemas: {},
       services: {},
       types: {
@@ -39,15 +44,20 @@ describe('registerHandlebarHelpers', () => {
 describe('registerHandlebarTemplates', () => {
   it('should return correct templates', () => {
     setConfig({
-      client: 'fetch',
+      client: {
+        name: 'fetch',
+      },
+      configFile: '',
       debug: false,
       dryRun: false,
+      experimental_parser: false,
       exportCore: true,
       input: '',
       output: {
         format: 'prettier',
         path: '',
       },
+      plugins: [],
       schemas: {},
       services: {},
       types: {

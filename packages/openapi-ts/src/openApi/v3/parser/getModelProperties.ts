@@ -15,16 +15,18 @@ import {
 import { isDefinitionNullable } from './inferType';
 
 export const getAdditionalPropertiesModel = ({
+  debug,
   definition,
   getModel,
   model,
   openApi,
   types,
 }: {
-  openApi: OpenApi;
+  debug?: boolean;
   definition: OpenApiSchema;
   getModel: GetModelFn;
   model: Model;
+  openApi: OpenApi;
   types: Client['types'];
 }): Model => {
   const ap =
@@ -32,6 +34,7 @@ export const getAdditionalPropertiesModel = ({
       ? definition.additionalProperties
       : {};
   const apModel = getModel({
+    debug,
     definition: ap,
     openApi,
     parentDefinition: definition,
@@ -49,7 +52,11 @@ export const getAdditionalPropertiesModel = ({
     return model;
   }
 
-  if (definition.additionalProperties && definition.properties) {
+  if (
+    definition.additionalProperties &&
+    definition.properties &&
+    Object.keys(definition.properties).length > 0
+  ) {
     const additionalPropertiesType =
       typeof definition.additionalProperties === 'object' &&
       definition.additionalProperties.type &&
@@ -57,7 +64,7 @@ export const getAdditionalPropertiesModel = ({
         ? definition.additionalProperties.type
         : apModel.base;
     const additionalProperties = [
-      additionalPropertiesType,
+      getType({ type: additionalPropertiesType }).base,
       ...model.properties.map((property) => property.base),
     ];
     apModel.base = additionalProperties.filter(unique).join(' | ');
@@ -79,12 +86,14 @@ export const getAdditionalPropertiesModel = ({
 };
 
 export const getModelProperties = ({
+  debug,
   definition,
   getModel,
   openApi,
   parent,
   types,
 }: {
+  debug?: boolean;
   definition: OpenApiSchema;
   getModel: GetModelFn;
   openApi: OpenApi;
@@ -99,6 +108,7 @@ export const getModelProperties = ({
       const propertyRequired = Boolean(
         definition.required?.includes(propertyName),
       );
+
       const propertyValues: Omit<
         Model,
         | '$refs'
@@ -118,7 +128,10 @@ export const getModelProperties = ({
         description: property.description || null,
         exclusiveMaximum: property.exclusiveMaximum,
         exclusiveMinimum: property.exclusiveMinimum,
-        format: property.format,
+        format:
+          property.type === 'array'
+            ? property.items?.format ?? property.format
+            : property.format,
         in: '',
         isDefinition: false,
         isReadOnly: property.readOnly === true,
@@ -155,7 +168,10 @@ export const getModelProperties = ({
             type: 'string',
           },
         ];
-      } else if (property.$ref) {
+        return;
+      }
+
+      if (property.$ref) {
         const model = getType({ type: property.$ref });
         models = [
           ...models,
@@ -174,17 +190,19 @@ export const getModelProperties = ({
             type: model.type,
           },
         ];
-      } else {
-        const model = getModel({
-          definition: property,
-          initialValues: propertyValues,
-          openApi,
-          parentDefinition: definition,
-          types,
-        });
-        model.isNullable = model.isNullable || isDefinitionNullable(property);
-        models = [...models, model];
+        return;
       }
+
+      const model = getModel({
+        debug,
+        definition: property,
+        initialValues: propertyValues,
+        openApi,
+        parentDefinition: definition,
+        types,
+      });
+      model.isNullable = model.isNullable || isDefinitionNullable(property);
+      models = [...models, model];
     },
   );
 

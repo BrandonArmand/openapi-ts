@@ -6,10 +6,8 @@ import type {
 } from '../../common/interfaces/client';
 import { getRef } from '../../common/parser/getRef';
 import {
-  getErrorResponses,
   getOperationName,
   getOperationResponseHeader,
-  getSuccessResponses,
 } from '../../common/parser/operation';
 import { getServiceName } from '../../common/parser/service';
 import { toSortedByRequired } from '../../common/parser/sort';
@@ -42,6 +40,7 @@ const mergeParameters = (
 };
 
 export const getOperation = ({
+  debug,
   method,
   op,
   openApi,
@@ -50,6 +49,7 @@ export const getOperation = ({
   types,
   url,
 }: {
+  debug?: boolean;
   method: Lowercase<Operation['method']>;
   op: OpenApiOperation;
   openApi: OpenApi;
@@ -65,7 +65,7 @@ export const getOperation = ({
     $refs: [],
     deprecated: Boolean(op.deprecated),
     description: op.description || null,
-    errors: [],
+    id: op.operationId || null,
     imports: [],
     method: method.toUpperCase() as Operation['method'],
     name,
@@ -78,7 +78,7 @@ export const getOperation = ({
     parametersQuery: [],
     path: url,
     responseHeader: null,
-    results: [],
+    responses: [],
     service,
     summary: op.summary || null,
   };
@@ -119,6 +119,7 @@ export const getOperation = ({
     const requestBodyDef = getRef<OpenApiRequestBody>(openApi, op.requestBody);
     const requestBody = getOperationRequestBody({
       body: requestBodyDef,
+      debug,
       openApi,
       types,
     });
@@ -129,20 +130,20 @@ export const getOperation = ({
   }
 
   if (op.responses) {
-    const operationResponses = getOperationResponses({
+    operation.responses = getOperationResponses({
       openApi,
       responses: op.responses,
       types,
     });
-    operation.errors = getErrorResponses(operationResponses);
+    const successResponses = operation.responses.filter((response) =>
+      response.responseTypes.includes('success'),
+    );
 
-    const successResponses = getSuccessResponses(operationResponses);
     operation.responseHeader = getOperationResponseHeader(successResponses);
 
-    successResponses.forEach((operationResult) => {
-      operation.$refs = [...operation.$refs, ...operationResult.$refs];
-      operation.imports = [...operation.imports, ...operationResult.imports];
-      operation.results = [...operation.results, operationResult];
+    successResponses.forEach((response) => {
+      operation.$refs = [...operation.$refs, ...response.$refs];
+      operation.imports = [...operation.imports, ...response.imports];
     });
   }
 
@@ -171,7 +172,6 @@ export const getOperation = ({
     pathParams.parametersQuery,
   );
 
-  // Sort by required
   operation.parameters = toSortedByRequired(operation.parameters);
 
   return operation;

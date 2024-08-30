@@ -1,5 +1,33 @@
 # @hey-api/docs
 
+## 0.5.11
+
+### Patch Changes
+
+- [#978](https://github.com/hey-api/openapi-ts/pull/978) [`2e051a5`](https://github.com/hey-api/openapi-ts/commit/2e051a596302c2e103dca25951a07b4aae1e9e23) Thanks [@mrlubos](https://github.com/mrlubos)! - docs: add basic TanStack Query plugin description
+
+## 0.5.10
+
+### Patch Changes
+
+- [#830](https://github.com/hey-api/openapi-ts/pull/830) [`babf11a`](https://github.com/hey-api/openapi-ts/commit/babf11ae082af642ac71cfee9c523cc976132a50) Thanks [@mrlubos](https://github.com/mrlubos)! - docs: split clients documentation into separate pages
+
+- [#830](https://github.com/hey-api/openapi-ts/pull/830) [`323d0a0`](https://github.com/hey-api/openapi-ts/commit/323d0a03c6560f27d0ce5eee1708ee16dc395532) Thanks [@mrlubos](https://github.com/mrlubos)! - docs: remove interceptors page in favour of per-client sections
+
+- [#830](https://github.com/hey-api/openapi-ts/pull/830) [`babf11a`](https://github.com/hey-api/openapi-ts/commit/babf11ae082af642ac71cfee9c523cc976132a50) Thanks [@mrlubos](https://github.com/mrlubos)! - docs: add v0.52.0 migration
+
+## 0.5.9
+
+### Patch Changes
+
+- [#828](https://github.com/hey-api/openapi-ts/pull/828) [`82a4696`](https://github.com/hey-api/openapi-ts/commit/82a4696b0b209ea2d9147f47f213479e61aed3d7) Thanks [@mrlubos](https://github.com/mrlubos)! - fix: add migration guide for v0.51.0
+
+## 0.5.8
+
+### Patch Changes
+
+- [#613](https://github.com/hey-api/openapi-ts/pull/613) [`b3786dc`](https://github.com/hey-api/openapi-ts/commit/b3786dc6749d8d4ae26bb63322e124663f881741) Thanks [@mrlubos](https://github.com/mrlubos)! - docs: add Axios client documentation
+
 ## 0.5.7
 
 ### Patch Changes
