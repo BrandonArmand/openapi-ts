@@ -171,11 +171,14 @@ export const createConstVariable = ({
  * @param module - module containing imports
  * @returns ts.ImportDeclaration
  */
-export const createNamedImportDeclarations = (
-  items: Array<ImportExportItem> | ImportExportItem,
-  module: string,
-): ts.ImportDeclaration => {
-  const importedTypes = Array.isArray(items) ? items : [items];
+export const createNamedImportDeclarations = ({
+  imports,
+  module,
+}: {
+  imports: Array<ImportExportItem> | ImportExportItem;
+  module: string;
+}): ts.ImportDeclaration => {
+  const importedTypes = Array.isArray(imports) ? imports : [imports];
   const config = getConfig();
   const addFileExtension = config?.output.addFileExtension;
   const hasNonTypeImport = importedTypes.some(
