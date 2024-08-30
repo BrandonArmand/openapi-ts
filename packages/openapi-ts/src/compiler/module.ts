@@ -15,7 +15,11 @@ import {
  * @param module - module containing exports
  * @returns ts.ExportDeclaration
  */
-export const createExportAllDeclaration = (module: string) => {
+export const createExportAllDeclaration = ({
+  module,
+}: {
+  module: string;
+}): ts.ExportDeclaration => {
   const config = getConfig();
   const addFileExtension = config.output.addFileExtension;
   return ts.factory.createExportDeclaration(
@@ -64,13 +68,16 @@ export const createCallExpression = ({
  * @param module - module containing exports
  * @returns ts.ExportDeclaration
  */
-export const createNamedExportDeclarations = (
-  items: Array<ImportExportItem> | ImportExportItem,
-  module: string,
-): ts.ExportDeclaration => {
-  items = Array.isArray(items) ? items : [items];
+export const createNamedExportDeclarations = ({
+  imports,
+  module,
+}: {
+  imports: Array<ImportExportItem> | ImportExportItem;
+  module: string;
+}): ts.ExportDeclaration => {
+  imports = Array.isArray(imports) ? imports : [imports];
 
-  const exportedTypes = Array.isArray(items) ? items : [items];
+  const exportedTypes = Array.isArray(imports) ? imports : [imports];
   const hasNonTypeExport = exportedTypes.some(
     (item) => typeof item !== 'object' || !item.asType,
   );
