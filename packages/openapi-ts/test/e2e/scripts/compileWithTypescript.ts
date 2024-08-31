@@ -11,7 +11,7 @@ import {
   sys
 } from 'typescript'
 
-export const compileWithTypescript = (dir: string) => {
+export const compileWithTypescript = (dir: string, {overrides}: { overrides?: any } = {}) => {
   const cwd = `./test/e2e/generated/${dir}/`
   const tsconfig = {
     compilerOptions: {
@@ -28,9 +28,11 @@ export const compileWithTypescript = (dir: string) => {
       skipLibCheck: true,
       sourceMap: false,
       strict: true,
-      target: 'es2020'
+      target: 'es2020',
+      ...(overrides?.compilerOptions || {})
     },
-    include: ['**/*.ts']
+    include: ['**/*.ts'],
+    ...overrides || {},
   }
 
   // Compile files to JavaScript (ES6 modules)

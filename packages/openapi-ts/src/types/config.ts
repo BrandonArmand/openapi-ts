@@ -82,6 +82,10 @@ export interface ClientConfig {
     | string
     | {
         /**
+         * Add file extension to generated files (e.g. '.js') for moduleResolution compatibility (node16/nodenext)
+         */
+        addFileExtension?: boolean;
+        /**
          * Process output folder with formatter?
          * @default false
          */
@@ -91,6 +95,7 @@ export interface ClientConfig {
          * @default false
          */
         lint?: 'biome' | 'eslint' | false;
+
         /**
          * The relative location of the output directory
          */

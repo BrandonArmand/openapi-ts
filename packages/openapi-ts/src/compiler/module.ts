@@ -1,5 +1,6 @@
 import ts from 'typescript';
 
+import { getConfig } from '../utils/config';
 import { createTypeReferenceNode } from './types';
 import {
   addLeadingComments,
@@ -19,13 +20,16 @@ export const createExportAllDeclaration = ({
 }: {
   module: string;
 }): ts.ExportDeclaration => {
-  const statement = ts.factory.createExportDeclaration(
+  const config = getConfig();
+  const addFileExtension = config.output.addFileExtension;
+  return ts.factory.createExportDeclaration(
     undefined,
     false,
     undefined,
-    ots.string(module),
+    ots.string(
+      module.startsWith('./') && addFileExtension ? `${module}.js` : module,
+    ),
   );
-  return statement;
 };
 
 export type ImportExportItem = ImportExportItemObject | string;
@@ -71,6 +75,8 @@ export const createNamedExportDeclarations = ({
   exports: Array<ImportExportItem> | ImportExportItem;
   module: string;
 }): ts.ExportDeclaration => {
+  exports = Array.isArray(exports) ? exports : [exports];
+
   const exportedTypes = Array.isArray(exports) ? exports : [exports];
   const hasNonTypeExport = exportedTypes.some(
     (item) => typeof item !== 'object' || !item.asType,
@@ -180,6 +186,8 @@ export const createNamedImportDeclarations = ({
   module: string;
 }): ts.ImportDeclaration => {
   const importedTypes = Array.isArray(imports) ? imports : [imports];
+  const config = getConfig();
+  const addFileExtension = config?.output.addFileExtension;
   const hasNonTypeImport = importedTypes.some(
     (item) => typeof item !== 'object' || !item.asType,
   );
@@ -197,7 +205,10 @@ export const createNamedImportDeclarations = ({
     undefined,
     namedBindings,
   );
-  const moduleSpecifier = ots.string(module);
+
+  const moduleSpecifier = ots.string(
+    module.startsWith('./') && addFileExtension ? `${module}.js` : module,
+  );
   const statement = ts.factory.createImportDeclaration(
     undefined,
     importClause,
