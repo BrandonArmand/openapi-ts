@@ -1,6 +1,6 @@
 import path from 'node:path'
 
-import {EOL} from 'os'
+import { EOL } from 'os'
 import {
   createCompilerHost,
   createProgram,
